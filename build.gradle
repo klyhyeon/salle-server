@@ -1,12 +1,16 @@
+import java.time.LocalDateTime
+
+
 plugins {
 	id 'org.springframework.boot' version '2.5.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
 
-group = 'com.salle'
-version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
+group = 'com.salle'
+var dateTime = LocalDateTime.now().format("YYYY-MM-DD")
+version = '0.0.1-SNAPSHOT' + dateTime
 
 configurations {
 	compileOnly {
@@ -19,13 +23,43 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+
+	compileOnly(
+		'org.projectlombok:lombok',
+		'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0',
+		'javax.servlet:javax.servlet-api:4.0.1',
+		'javax.servlet:jstl:1.2',
+		'mysql:mysql-connector-java:8.0.26',
+		'org.apache.commons:commons-lang3:3.11',
+		'javax.validation:validation-api:2.0.1.Final',
+		'org.apache.tomcat.embed:tomcat-embed-jasper:9.0.43',
+		'org.json:json:20160810',
+		'org.springframework:spring-messaging:5.3.4',
+		'org.springframework.boot:spring-boot-autoconfigure:2.4.3',
+		'org.springframework.boot:spring-boot-starter-data-jpa:2.4.3',
+		'org.springframework.boot:spring-boot-starter-web:2.4.3',
+		'org.springframework.boot:spring-boot-starter-websocket:2.4.3',
+		'org.webjars:sockjs-client:1.1.2',
+		'org.webjars:stomp-websocket:2.3.3-1',
+		'taglibs:standard:1.1.2'
+	)
+
+	implementation(
+		'org.springframework.boot:spring-boot-starter-data-jpa',
+		'org.springframework.boot:spring-boot-starter-web'
+	)
+
+	developmentOnly(
+		'org.springframework.boot:spring-boot-devtools'
+	)
+
+	annotationProcessor(
+		'org.projectlombok:lombok'
+	)
+
+	testImplementation(
+		'org.springframework.boot:spring-boot-starter-test'
+	)
 }
 
 test {
