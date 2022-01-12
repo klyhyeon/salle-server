@@ -1,0 +1,57 @@
+
+#profile groups
+spring:
+  profiles:
+    group:
+      dev:
+        - "local"
+        - "common"
+
+---
+#local, dev, prod ????
+spring:
+  config:
+    activate:
+      on-profile: "common"
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+#server
+server:
+  port: 8080
+
+---
+#dev profile
+spring:
+  config:
+    activate:
+      on-profile: "local"
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/salle?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 1234
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+      show-sql: true
+    hibernate:
+      ddl-auto: "create-drop"
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+#logging
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          client: DEBUG
+      hibernate:
+        type: trace
+---
