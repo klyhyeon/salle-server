@@ -17,6 +17,7 @@ public class Address {
         this.region1 = region1;
         this.region2 = region2;
     }
+    //git test
 
     private String region1; //주소검색 결과
 
