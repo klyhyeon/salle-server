@@ -7,7 +7,7 @@ plugins {
 	id 'java'
 }
 
-sourceCompatibility = '11'
+sourceCompatibility = '16'
 group = 'com.salle'
 var dateTime = LocalDateTime.now().format("YYYY-MM-DD")
 version = '0.0.1-SNAPSHOT' + dateTime
