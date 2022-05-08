@@ -46,7 +46,8 @@ dependencies {
 
 	implementation(
 		'org.springframework.boot:spring-boot-starter-data-jpa',
-		'org.springframework.boot:spring-boot-starter-web'
+		'org.springframework.boot:spring-boot-starter-web',
+		'com.amazonaws:aws-java-sdk-s3:1.12.213'
 	)
 
 	developmentOnly(
@@ -54,7 +55,8 @@ dependencies {
 	)
 
 	annotationProcessor(
-		'org.projectlombok:lombok'
+		'org.projectlombok:lombok',
+		'org.springframework.boot:spring-boot-configuration-processor'
 	)
 
 	testImplementation(
