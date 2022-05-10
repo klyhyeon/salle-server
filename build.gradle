@@ -1,69 +1,91 @@
 import java.time.LocalDateTime
 
-
 plugins {
-	id 'org.springframework.boot' version '2.5.6'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.5.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
-sourceCompatibility = '16'
-group = 'com.salle'
-var dateTime = LocalDateTime.now().format("YYYY-MM-DD")
-version = '0.0.1-SNAPSHOT' + dateTime
+group = 'salle'
+var dateTime = LocalDateTime.now()
+version = '0.0.1-SNAPSHOT_' + dateTime
+
+ext {
+    querydslDir = "$buildDir/generated/querydsl"
+    queryDslVersion = "4.4.0"
+}
+
+// QueryDSL
+sourceSets {
+    main {
+        java {
+            srcDirs = ["$projectDir/src/main/java", "$buildDir/generated"]
+        }
+    }
+}
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
 
-	compileOnly(
-		'org.projectlombok:lombok',
-		'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0',
-		'javax.servlet:javax.servlet-api:4.0.1',
-		'javax.servlet:jstl:1.2',
-		'mysql:mysql-connector-java:8.0.26',
-		'org.apache.commons:commons-lang3:3.11',
-		'javax.validation:validation-api:2.0.1.Final',
-		'org.apache.tomcat.embed:tomcat-embed-jasper:9.0.43',
-		'org.json:json:20160810',
-		'org.springframework:spring-messaging:5.3.4',
-		'org.springframework.boot:spring-boot-autoconfigure:2.4.3',
-		'org.springframework.boot:spring-boot-starter-data-jpa:2.4.3',
-		'org.springframework.boot:spring-boot-starter-web:2.4.3',
-		'org.springframework.boot:spring-boot-starter-websocket:2.4.3',
-		'org.webjars:sockjs-client:1.1.2',
-		'org.webjars:stomp-websocket:2.3.3-1',
-		'taglibs:standard:1.1.2'
-	)
+    compileOnly(
+            'org.projectlombok:lombok',
+            'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.0',
+            'javax.servlet:javax.servlet-api:4.0.1',
+            'javax.servlet:jstl:1.2',
+            'org.apache.commons:commons-lang3:3.11',
+            'javax.validation:validation-api:2.0.1.Final',
+            'org.apache.tomcat.embed:tomcat-embed-jasper:9.0.43',
+            'org.json:json:20160810',
+            'org.springframework:spring-messaging:5.3.4',
+            'org.springframework.boot:spring-boot-autoconfigure:2.4.3',
+            'org.springframework.boot:spring-boot-starter-data-jpa:2.4.3',
+            'org.springframework.boot:spring-boot-starter-web:2.4.3',
+            'org.springframework.boot:spring-boot-starter-websocket:2.4.3',
+            'org.webjars:sockjs-client:1.1.2',
+            'org.webjars:stomp-websocket:2.3.3-1',
+            'taglibs:standard:1.1.2'
+    )
 
-	implementation(
-		'org.springframework.boot:spring-boot-starter-data-jpa',
-		'org.springframework.boot:spring-boot-starter-web',
-		'com.amazonaws:aws-java-sdk-s3:1.12.213'
-	)
+    implementation(
+            'org.springframework.boot:spring-boot-starter-data-jpa',
+            'org.springframework.boot:spring-boot-starter-web',
+            'com.amazonaws:aws-java-sdk-s3:1.12.213',
+            'io.springfox:springfox-boot-starter:3.0.0',
+            'io.springfox:springfox-swagger-ui:2.9.2',
+            'mysql:mysql-connector-java:8.0.26',
+            "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    )
 
-	developmentOnly(
-		'org.springframework.boot:spring-boot-devtools'
-	)
+    developmentOnly(
+            'org.springframework.boot:spring-boot-devtools'
+    )
 
-	annotationProcessor(
-		'org.projectlombok:lombok',
-		'org.springframework.boot:spring-boot-configuration-processor'
-	)
+    annotationProcessor(
+            'org.projectlombok:lombok',
+            'org.springframework.boot:spring-boot-configuration-processor',
+            'javax.persistence:javax.persistence-api',
+            'javax.annotation:javax.annotation-api',
+            "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+    )
 
-	testImplementation(
-		'org.springframework.boot:spring-boot-starter-test'
-	)
+    testImplementation(
+            'org.springframework.boot:spring-boot-starter-test'
+    )
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+clean {
+    delete file('src/main/generated')
 }
