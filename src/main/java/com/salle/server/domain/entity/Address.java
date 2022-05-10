@@ -1,4 +1,4 @@
-package com.salle.server.domain;
+package com.salle.server.domain.entity;
 
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.salle.server.domain;
+package com.salle.server.domain.entity;
 
 import javax.persistence.*;
 
@@ -15,4 +15,12 @@ public class ProductImage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

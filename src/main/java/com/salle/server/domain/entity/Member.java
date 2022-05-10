@@ -1,4 +1,6 @@
-package com.salle.server.domain;
+package com.salle.server.domain.entity;
+
+import com.salle.server.utils.Encrypt;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -28,4 +30,25 @@ public class Member {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
     private List<MemberChatRoom> memberChatRooms;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isWrongPassword(String rawMemberInputPwd) {
+        String encryptedMemberInputPwd = Encrypt.createPassword(rawMemberInputPwd);
+        return !password.equals(encryptedMemberInputPwd);
+    }
+
+    public void encryptAndSetPassword(String rawPwd) {
+        this.password = Encrypt.createPassword(rawPwd);
+    }
 }

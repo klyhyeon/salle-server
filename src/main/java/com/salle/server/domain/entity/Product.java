@@ -1,7 +1,11 @@
-package com.salle.server.domain;
+package com.salle.server.domain.entity;
+
+import com.salle.server.domain.enumeration.ProductStatus;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Entity
@@ -15,9 +19,11 @@ public class Product {
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     private LocalDateTime deletedTime;
-    private int status; //판매완료, 삭제, 판매중
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status; //판매중(0), 판매완료(1), 삭제(2),
+
     private String title;
-    private String titleAlias;
 
     @Embedded
     private Address address;
@@ -37,4 +43,26 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
+    }
+
+    public long getHoursFromUpload() {
+        long now = System.currentTimeMillis();
+        long diffTime = now - createdTime.toInstant(ZoneOffset.of("+09:00")).toEpochMilli();
+        long hours = diffTime / (1000 * 3600);
+        if (hours < 1) {
+            hours = 0;
+        }
+        return hours;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
+    }
 }
