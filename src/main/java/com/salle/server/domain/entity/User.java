@@ -8,14 +8,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "MEMBER")
-public class Member {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private int id; //자동생성
+    private Long id; //자동생성
     private String phone;
-    @Column(name = "member_name")
     private String name;
     private String email;
     private String nickName;
@@ -23,13 +21,9 @@ public class Member {
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     private LocalDateTime deletedTime;
-    private int status; //휴면, 탈퇴, 활동
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+    @OneToMany(mappedBy = "user")
     private List<Product> products;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
-    private List<MemberChatRoom> memberChatRooms;
 
     public String getPassword() {
         return password;
