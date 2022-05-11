@@ -1,22 +1,23 @@
 package com.salle.server.service;
 
-import com.salle.server.domain.entity.Category;
-import com.salle.server.domain.entity.Member;
-import com.salle.server.domain.entity.Product;
-import com.salle.server.domain.entity.ProductImage;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.salle.server.domain.dto.ProductDTO;
+import com.salle.server.domain.entity.*;
 import com.salle.server.domain.enumeration.ErrorCode;
 import com.salle.server.domain.enumeration.ProductStatus;
 import com.salle.server.error.SlErrorException;
 import com.salle.server.repository.ProductImageRepository;
+import com.salle.server.repository.ProductLikeRepository;
 import com.salle.server.repository.ProductRepository;
 import com.salle.server.repository.ProductRepositoryImpl;
 import com.salle.server.utils.AmazonS3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.MultipartRequest;
 
 import java.util.ArrayList;
@@ -31,19 +32,27 @@ public class ProductService {
     private ProductRepository productRepository;
     private ProductImageRepository productImageRepository;
     private ProductRepositoryImpl productRepositoryImpl;
+    private ProductLikeRepository productLikeRepository;
     private AmazonS3Service amazonS3;
+    private ObjectMapper objectMapper;
 
     public ProductService(ProductRepository productRepository,
                           ProductImageRepository productImageRepository,
-                          ProductRepositoryImpl productRepositoryImpl) {
+                          ProductRepositoryImpl productRepositoryImpl,
+                          ObjectMapper objectMapper,
+                          ProductLikeRepository productLikeRepository,
+                          AmazonS3Service amazonS3) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.productRepositoryImpl = productRepositoryImpl;
+        this.objectMapper = objectMapper;
+        this.productLikeRepository = productLikeRepository;
+        this.amazonS3 = amazonS3;
     }
 
     @Transactional
-    public void saveProductAndImages(Product product, MultipartRequest multipartRequest, Member member) {
-        product.setMember(member);
+    public void save(Product product, MultipartRequest multipartRequest, User member) {
+        product.setUser(member);
         product.setStatus(ProductStatus.SELL);
         Product savedProduct = productRepository.save(product);
 
@@ -77,26 +86,42 @@ public class ProductService {
     }
 
     @Transactional
-    public void delete(int id) {
-        Product product = findById(id);
+    public void delete(Long id) {
+        Product product = getById(id);
         productRepository.delete(product);
     }
 
     @Transactional(readOnly = true)
-    public Product findById(int id) {
+    public Product getById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> {
             throw new SlErrorException(ErrorCode.PRODUCT_NOT_FOUND);
         });
     }
 
     @Transactional(readOnly = true)
-    public List<Product> findAll() {
-        return productRepository.findAll();
+    public Page<ProductDTO> getAll(Pageable pageable) {
+        Page<Product> allProducts = productRepository.findAllByDeletedTimeIsNull(pageable);
+        return mapToProductDTO(allProducts);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> getAllWithLikesAndComments(Pageable pageable, User user) {
+        Page<ProductDTO> allProductsDTO = getAll(pageable);
+        List<ProductLike> userProductLikeHistories = productLikeRepository.findAllByUser(user);
+
+        userProductLikeHistories.forEach(productLike ->
+                allProductsDTO.forEach(productDTO ->
+                        productDTO.setLikesTrueIfHistoryExists(productLike.getProduct().getId())
+                )
+        );
+
+        return allProductsDTO;
     }
 
     @Transactional(readOnly = true)
-    public List<Product> findAllByCategory(Category category) {
-        return productRepository.findByCategory(category);
+    public Page<Product> findAllByCategory(Pageable pageable, Category category) {
+        return productRepository.findByCategory(pageable, category);
     }
 
     //TODO graphQL 가능, Product는 필요한 정보들이 모든 데이터가 아닌, 부분 데이터일 때가 있음
@@ -116,8 +141,12 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteImages(List<Integer> imageIds) {
+    public void deleteImages(List<Long> imageIds) {
         productImageRepository.deleteAllById(imageIds);
+    }
+
+    public Page<ProductDTO> mapToProductDTO(Page<Product> allProducts) {
+        return allProducts.map(board -> objectMapper.convertValue(board, ProductDTO.class));
     }
 
 }

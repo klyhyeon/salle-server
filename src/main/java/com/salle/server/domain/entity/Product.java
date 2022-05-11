@@ -1,21 +1,22 @@
 package com.salle.server.domain.entity;
 
 import com.salle.server.domain.enumeration.ProductStatus;
+import lombok.Getter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
 @Entity
+@Getter
 @Table(name = "PRODUCT")
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
-    private int id; //자동생성
+    private Long id;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     private LocalDateTime deletedTime;
@@ -24,28 +25,28 @@ public class Product {
     private ProductStatus status; //판매중(0), 판매완료(1), 삭제(2),
 
     private String title;
-
-    @Embedded
-    private Address address;
-    private int price;
+    private Long price;
     private String description;
+    //TODO camelcase convert automatically???
+    private Long likesCount = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product")
-    private List<ChatRoom> chatRooms;
 
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;
 
-    public void setMember(Member member) {
-        this.member = member;
+    @OneToMany(mappedBy = "product")
+    private List<ProductComment> productComments;
+
+    public void setUser(User member) {
+        this.user = member;
     }
 
     public void setStatus(ProductStatus status) {
@@ -57,7 +58,7 @@ public class Product {
         long diffTime = now - createdTime.toInstant(ZoneOffset.of("+09:00")).toEpochMilli();
         long hours = diffTime / (1000 * 3600);
         if (hours < 1) {
-            hours = 0;
+            hours = 0L;
         }
         return hours;
     }
