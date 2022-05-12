@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "MEMBER")
+@Table(name = "USER")
 public class User {
 
     @Id
@@ -37,9 +37,9 @@ public class User {
         this.password = password;
     }
 
-    public boolean isWrongPassword(String rawMemberInputPwd) {
-        String encryptedMemberInputPwd = Encrypt.createPassword(rawMemberInputPwd);
-        return !password.equals(encryptedMemberInputPwd);
+    public boolean isWrongPassword(String rawUserInputPwd) {
+        String encryptedUserInputPwd = Encrypt.createPassword(rawUserInputPwd);
+        return !password.equals(encryptedUserInputPwd);
     }
 
     public void encryptAndSetPassword(String rawPwd) {

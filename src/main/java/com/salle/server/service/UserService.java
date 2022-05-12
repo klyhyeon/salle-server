@@ -17,31 +17,31 @@ public class UserService {
     }
 
     @Transactional
-    public User saveMember(User member) {
-        String rawPwd = member.getPassword();
-        member.encryptAndSetPassword(rawPwd);
-        return userRepository.save(member);
+    public User saveUser(User user) {
+        String rawPwd = user.getPassword();
+        user.encryptAndSetPassword(rawPwd);
+        return userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public User findMemberByEmail(String email) {
+    public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public void verifyLogin(User member) {
-        String logInMemberEmail = member.getEmail();
-        String rawMemberInputPwd = member.getPassword();
-        User logInMemberInfoFromDB = userRepository.findByEmail(logInMemberEmail);
+    public void verifyLogin(User user) {
+        String logInUserEmail = user.getEmail();
+        String rawUserInputPwd = user.getPassword();
+        User logInUserInfoFromDB = userRepository.findByEmail(logInUserEmail);
 
-        checkEmailAndPwd(logInMemberInfoFromDB, rawMemberInputPwd);
+        checkEmailAndPwd(logInUserInfoFromDB, rawUserInputPwd);
     }
 
-    public void checkEmailAndPwd(User logInMemberInfoFromDB, String rawMemberInputPwd) {
-        if (logInMemberInfoFromDB == null) {
+    public void checkEmailAndPwd(User logInUserInfoFromDB, String rawUserInputPwd) {
+        if (logInUserInfoFromDB == null) {
             throw new SlErrorException(ErrorCode.USER_NOT_FOUND);
         }
 
-        if (logInMemberInfoFromDB.isWrongPassword(rawMemberInputPwd)) {
+        if (logInUserInfoFromDB.isWrongPassword(rawUserInputPwd)) {
             throw new SlErrorException(ErrorCode.WRONG_PASSWORD);
         }
     }
