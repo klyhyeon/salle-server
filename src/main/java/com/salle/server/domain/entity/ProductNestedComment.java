@@ -5,20 +5,18 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "PRODUCT_COMMENT")
-public class ProductComment {
+@Table(name = "PRODUCT_NESTED_COMMENT")
+public class ProductNestedComment {
 
-    public static ProductComment getRawInstance(Product product, User user) {
-        return new ProductComment(product, user);
+    public static ProductNestedComment getInstance(Product product, User user) {
+        return new ProductNestedComment(product, user);
     }
 
-    private ProductComment(Product product, User user) {
+    private ProductNestedComment(Product product, User user) {
         this.product = product;
         this.user = user;
     }
@@ -35,8 +33,8 @@ public class ProductComment {
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
-    @OneToMany(mappedBy = "productComment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductNestedComment> productNestedComments = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ProductComment productComment;
 
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
@@ -64,13 +62,12 @@ public class ProductComment {
         this.content = content;
     }
 
-    public void updateProductComment(ProductComment requestProductComment) {
+    public void updateProductComment(ProductNestedComment requestProductNestedComment) {
         this.updatedTime = LocalDateTime.now();
-        this.content = requestProductComment.getContent();
+        this.content = requestProductNestedComment.getContent();
     }
 
-    public void addProductNestedComment(ProductNestedComment productNestedComment) {
-        productNestedComments.add(productNestedComment);
-        productNestedComment.setProductComment(this);
+    public void setProductComment(ProductComment productComment) {
+        this.productComment = productComment;
     }
 }

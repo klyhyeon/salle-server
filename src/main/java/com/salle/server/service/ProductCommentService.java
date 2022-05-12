@@ -2,6 +2,7 @@ package com.salle.server.service;
 
 import com.salle.server.domain.entity.Product;
 import com.salle.server.domain.entity.ProductComment;
+import com.salle.server.domain.entity.ProductNestedComment;
 import com.salle.server.domain.entity.User;
 import com.salle.server.domain.enumeration.ErrorCode;
 import com.salle.server.error.SlErrorException;
@@ -32,8 +33,9 @@ public class ProductCommentService {
     }
 
     @Transactional
-    public void saveNestedComment(Product product, User user, ProductComment nestedProductComment) {
-        ProductComment productComment = ProductComment.getNestedInstance(product, user, nestedProductComment);
+    public void saveNestedComment(Long productCommentId, ProductNestedComment productNestedComment) {
+        ProductComment productComment = getById(productCommentId);
+        productComment.addProductNestedComment(productNestedComment);
         productCommentRepository.save(productComment);
     }
 
