@@ -1,6 +1,5 @@
 package com.salle.server.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salle.server.domain.dto.ProductDTO;
 import com.salle.server.domain.entity.*;
 import com.salle.server.domain.enumeration.ErrorCode;
@@ -11,6 +10,7 @@ import com.salle.server.repository.ProductLikeRepository;
 import com.salle.server.repository.ProductRepository;
 import com.salle.server.repository.ProductRepositoryImpl;
 import com.salle.server.utils.AmazonS3Service;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,25 +34,24 @@ public class ProductService {
     private ProductRepositoryImpl productRepositoryImpl;
     private ProductLikeRepository productLikeRepository;
     private AmazonS3Service amazonS3;
-    private ObjectMapper objectMapper;
+    private ModelMapper modelMapper;
 
     public ProductService(ProductRepository productRepository,
                           ProductImageRepository productImageRepository,
                           ProductRepositoryImpl productRepositoryImpl,
-                          ObjectMapper objectMapper,
                           ProductLikeRepository productLikeRepository,
                           AmazonS3Service amazonS3) {
         this.productRepository = productRepository;
         this.productImageRepository = productImageRepository;
         this.productRepositoryImpl = productRepositoryImpl;
-        this.objectMapper = objectMapper;
         this.productLikeRepository = productLikeRepository;
         this.amazonS3 = amazonS3;
+        this.modelMapper = new ModelMapper();
     }
 
     @Transactional
-    public void save(Product product, MultipartRequest multipartRequest, User member) {
-        product.setUser(member);
+    public void save(Product product, MultipartRequest multipartRequest, User user) {
+        product.setUser(user);
         product.setStatus(ProductStatus.SELL);
         Product savedProduct = productRepository.save(product);
 
@@ -146,7 +145,7 @@ public class ProductService {
     }
 
     public Page<ProductDTO> mapToProductDTO(Page<Product> allProducts) {
-        return allProducts.map(board -> objectMapper.convertValue(board, ProductDTO.class));
+        return allProducts.map(product -> modelMapper.map(product, ProductDTO.class));
     }
 
 }

@@ -15,7 +15,6 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "product_id")
     private Long id;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
@@ -27,7 +26,6 @@ public class Product {
     private String title;
     private Long price;
     private String description;
-    //TODO camelcase convert automatically???
     private Long likesCount = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,15 +36,14 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
     @OneToMany(mappedBy = "product")
     private List<ProductImage> productImages;
 
     @OneToMany(mappedBy = "product")
     private List<ProductComment> productComments;
 
-    public void setUser(User member) {
-        this.user = member;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void setStatus(ProductStatus status) {

@@ -62,7 +62,8 @@ dependencies {
             'io.springfox:springfox-boot-starter:3.0.0',
             'io.springfox:springfox-swagger-ui:2.9.2',
             'mysql:mysql-connector-java:8.0.26',
-            "com.querydsl:querydsl-jpa:${queryDslVersion}"
+            "com.querydsl:querydsl-jpa:${queryDslVersion}",
+            'org.modelmapper:modelmapper:3.0.0'
     )
 
     developmentOnly(

@@ -5,11 +5,13 @@ import com.salle.server.domain.entity.ProductComment;
 import com.salle.server.domain.entity.User;
 import com.salle.server.domain.enumeration.ProductStatus;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@Setter
 public class ProductDTO {
 
     private Long id;
@@ -17,12 +19,11 @@ public class ProductDTO {
     private String title;
     private Long price;
     private String description;
-    private User member;
+    private User user;
     private Category category;
     private LocalDateTime createdTime;
     private LocalDateTime modifiedTime;
     private LocalDateTime deletedTime;
-    private User user;
     private Long likesCount;
     private boolean likes;
     private List<ProductComment> productComments;
