@@ -1,6 +1,8 @@
 package com.salle.server.domain.entity;
 
+import com.salle.server.domain.enumeration.OauthType;
 import com.salle.server.utils.Encrypt;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -10,14 +12,24 @@ import java.util.List;
 @Table(name = "USER")
 public class User {
 
+    public User() {
+    }
+
+    @Builder
+    public User(String oauthLogin, String oauthId, OauthType oauthType) {
+        this.oauthLogin = oauthLogin;
+        this.oauthId = oauthId;
+        this.oauthType = oauthType;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; //자동생성
-    private String phone;
     private String name;
-    private String email;
-    private String nickName;
-    private String password;
+    private String oauthLogin;
+    private String oauthId;
+    @Enumerated(value = EnumType.STRING)
+    private OauthType oauthType;
     private LocalDateTime createdTime;
     private LocalDateTime updatedTime;
     private LocalDateTime deletedTime;
@@ -25,24 +37,20 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Product> products;
 
-    public String getPassword() {
-        return password;
+    public String getOauthId() {
+        return oauthId;
     }
 
-    public String getEmail() {
-        return email;
+    public OauthType getOauthType() {
+        return oauthType;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public Long getId() {
+        return id;
     }
 
-    public boolean isWrongPassword(String rawUserInputPwd) {
-        String encryptedUserInputPwd = Encrypt.createPassword(rawUserInputPwd);
-        return !password.equals(encryptedUserInputPwd);
+    public String getOauthLogin() {
+        return oauthLogin;
     }
 
-    public void encryptAndSetPassword(String rawPwd) {
-        this.password = Encrypt.createPassword(rawPwd);
-    }
 }

@@ -1,9 +1,10 @@
 package com.salle.server.service;
 
 import com.salle.server.domain.entity.User;
-import com.salle.server.domain.enumeration.ErrorCode;
-import com.salle.server.error.SlErrorException;
+import com.salle.server.domain.enumeration.OauthType;
+import com.salle.server.domain.factory.oauth.OAuthFactory;
 import com.salle.server.repository.UserRepository;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,33 +17,27 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    @Transactional
-    public User saveUser(User user) {
-        String rawPwd = user.getPassword();
-        user.encryptAndSetPassword(rawPwd);
-        return userRepository.save(user);
-    }
 
     @Transactional(readOnly = true)
     public User findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    public void verifyLogin(User user) {
-        String logInUserEmail = user.getEmail();
-        String rawUserInputPwd = user.getPassword();
-        User logInUserInfoFromDB = userRepository.findByEmail(logInUserEmail);
-
-        checkEmailAndPwd(logInUserInfoFromDB, rawUserInputPwd);
+    @Transactional
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
-    public void checkEmailAndPwd(User logInUserInfoFromDB, String rawUserInputPwd) {
-        if (logInUserInfoFromDB == null) {
-            throw new SlErrorException(ErrorCode.USER_NOT_FOUND);
-        }
+    @Transactional
+    public User createUserOrReturnExistingUserByOauthType(OAuth2User principal, OAuthFactory oauthFactory) {
+        User user = oauthFactory.createUser(principal);
+        return createUserOrGetExistingUser(user);
+    }
 
-        if (logInUserInfoFromDB.isWrongPassword(rawUserInputPwd)) {
-            throw new SlErrorException(ErrorCode.WRONG_PASSWORD);
-        }
+    private User createUserOrGetExistingUser(User user) {
+        OauthType userOauthType = user.getOauthType();
+        String userOauthId = user.getOauthId();
+        return userRepository.findByOauthTypeAndOauthId(userOauthType, userOauthId)
+                .orElseGet(() -> saveUser(user));
     }
 }
