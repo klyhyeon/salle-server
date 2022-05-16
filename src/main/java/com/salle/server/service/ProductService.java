@@ -50,12 +50,13 @@ public class ProductService {
     }
 
     @Transactional
-    public void save(Product product, MultipartRequest multipartRequest, User user) {
+    public ProductDTO save(Product product, MultipartRequest multipartRequest, User user) {
         product.setUser(user);
         product.setStatus(ProductStatus.SELL);
         Product savedProduct = productRepository.save(product);
 
         uploadAndSaveProductImages(multipartRequest, savedProduct);
+        return mapToProductDTO(savedProduct);
     }
 
     public void uploadAndSaveProductImages(MultipartRequest multipartRequest, Product product) {
@@ -86,12 +87,12 @@ public class ProductService {
 
     @Transactional
     public void delete(Long id) {
-        Product product = getById(id);
+        Product product = findById(id);
         productRepository.delete(product);
     }
 
     @Transactional(readOnly = true)
-    public Product getById(Long id) {
+    public Product findById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> {
             throw new SlErrorException(ErrorCode.PRODUCT_NOT_FOUND);
         });
@@ -100,22 +101,34 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductDTO> getAll(Pageable pageable) {
         Page<Product> allProducts = productRepository.findAllByDeletedTimeIsNull(pageable);
-        return mapToProductDTO(allProducts);
+        return mapToProductDTOs(allProducts);
     }
-
 
     @Transactional(readOnly = true)
     public Page<ProductDTO> getAllWithLikesAndComments(Pageable pageable, User user) {
-        Page<ProductDTO> allProductsDTO = getAll(pageable);
+        Page<ProductDTO> allProductsDTO = getAllWithComments(pageable);
         List<ProductLike> userProductLikeHistories = productLikeRepository.findAllByUser(user);
 
         userProductLikeHistories.forEach(productLike ->
                 allProductsDTO.forEach(productDTO ->
-                        productDTO.setLikesTrueIfHistoryExists(productLike.getProduct().getId())
+                {
+                    productDTO.setLikesTrueIfHistoryExists(productLike.getProduct().getId());
+                }
                 )
         );
 
         return allProductsDTO;
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> getAllWithComments(Pageable pageable) {
+        productRepositoryImpl.findAllWithComments(pageable);
+        return null;
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDTO getProductById(Long id) {
+        return mapToProductDTO(findById(id));
     }
 
     @Transactional(readOnly = true)
@@ -130,8 +143,9 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProduct(Product product) {
-        productRepository.save(product);
+    public ProductDTO updateProduct(Product product) {
+        Product updatedProduct = productRepository.save(product);
+        return mapToProductDTO(updatedProduct);
     }
 
     @Transactional(readOnly = true)
@@ -144,8 +158,12 @@ public class ProductService {
         productImageRepository.deleteAllById(imageIds);
     }
 
-    public Page<ProductDTO> mapToProductDTO(Page<Product> allProducts) {
+    public Page<ProductDTO> mapToProductDTOs(Page<Product> allProducts) {
         return allProducts.map(product -> modelMapper.map(product, ProductDTO.class));
+    }
+
+    public ProductDTO mapToProductDTO(Product product) {
+        return modelMapper.map(product, ProductDTO.class);
     }
 
 }

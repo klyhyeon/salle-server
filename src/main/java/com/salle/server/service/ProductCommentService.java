@@ -28,7 +28,7 @@ public class ProductCommentService {
 
     @Transactional
     public void save(Product product, User user) {
-        ProductComment productComment = ProductComment.getRawInstance(product, user);
+        ProductComment productComment = new ProductComment();
         productCommentRepository.save(productComment);
     }
 

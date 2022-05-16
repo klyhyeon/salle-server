@@ -6,6 +6,7 @@ import lombok.Getter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,19 +29,19 @@ public class Product {
     private String description;
     private Long likesCount = 0L;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(mappedBy = "product")
-    private List<ProductImage> productImages;
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    private List<ProductImage> productImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
-    private List<ProductComment> productComments;
+    private List<ProductComment> productComments = new ArrayList<>();
 
     public void setUser(User user) {
         this.user = user;
@@ -62,5 +63,10 @@ public class Product {
 
     public ProductStatus getStatus() {
         return status;
+    }
+
+    public void addProductComment(ProductComment productComment) {
+        productComments.add(productComment);
+        productComment.setProduct(this);
     }
 }

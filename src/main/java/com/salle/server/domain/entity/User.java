@@ -1,11 +1,11 @@
 package com.salle.server.domain.entity;
 
 import com.salle.server.domain.enumeration.OauthType;
-import com.salle.server.utils.Encrypt;
 import lombok.Builder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,7 +35,10 @@ public class User {
     private LocalDateTime deletedTime;
 
     @OneToMany(mappedBy = "user")
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ProductComment> productComments = new ArrayList<>();
 
     public String getOauthId() {
         return oauthId;

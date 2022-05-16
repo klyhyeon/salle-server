@@ -1,8 +1,10 @@
 package com.salle.server.service;
 
 import com.salle.server.domain.entity.User;
+import com.salle.server.domain.enumeration.ErrorCode;
 import com.salle.server.domain.enumeration.OauthType;
 import com.salle.server.domain.factory.oauth.OAuthFactory;
+import com.salle.server.error.SlErrorException;
 import com.salle.server.repository.UserRepository;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,8 @@ public class UserService {
 
 
     @Transactional(readOnly = true)
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> {throw new SlErrorException(ErrorCode.USER_NOT_FOUND);});
     }
 
     @Transactional

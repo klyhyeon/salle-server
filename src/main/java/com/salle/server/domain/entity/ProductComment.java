@@ -1,5 +1,6 @@
 package com.salle.server.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,15 +15,6 @@ import java.util.List;
 @Table(name = "PRODUCT_COMMENT")
 public class ProductComment {
 
-    public static ProductComment getRawInstance(Product product, User user) {
-        return new ProductComment(product, user);
-    }
-
-    private ProductComment(Product product, User user) {
-        this.product = product;
-        this.user = user;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,9 +22,11 @@ public class ProductComment {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Product product;
 
     @OneToMany(mappedBy = "productComment", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -58,6 +52,14 @@ public class ProductComment {
         LocalDateTime now = LocalDateTime.now();
         this.updatedTime = now;
         this.deletedTime = now;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public void setContent(String content) {

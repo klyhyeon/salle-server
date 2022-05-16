@@ -16,8 +16,10 @@ import java.util.Map;
 @Component
 public class JwtTokenProvider {
 
-    public final static String SECRET_KEY = "encryptedKeyencryptedKeyencryptedKeyencryptedKeyencryptedKey";
-
+    public final static String SECRET_KEY = "fceeae51e1bda03cac21a8bcc112fe2dd10d4d1bd64714118db74f4cec664e3b";
+    public static final String OAUTH_LOGIN = "oauthLogin";
+    public static final String OAUTH_TYPE = "oauthType";
+    public static final String USER_ID = "userId";
 
     public String createAuthToken(User user) {
 
@@ -34,9 +36,9 @@ public class JwtTokenProvider {
         String oauthLogin = user.getOauthLogin();
         String oauthType = user.getOauthType().name();
         String userId = String.valueOf(user.getId());
-        claimMap.put("oauthLogin", oauthLogin);
-        claimMap.put("oauthType", oauthType);
-        claimMap.put("userId", userId);
+        claimMap.put(OAUTH_LOGIN, oauthLogin);
+        claimMap.put(OAUTH_TYPE, oauthType);
+        claimMap.put(USER_ID, userId);
 
         JwtBuilder builder = Jwts.builder().setHeader(headerMap)
                 .setClaims(claimMap)
@@ -52,9 +54,9 @@ public class JwtTokenProvider {
                 .getBody();
 
         Map<String, String> map = new HashMap<>();
-        map.put("login", claims.get("login", String.class));
-        map.put("userId", claims.get("userId", String.class));
-        map.put("loginType", claims.get("loginType", String.class));
+        map.put(OAUTH_LOGIN, claims.get(OAUTH_LOGIN, String.class));
+        map.put(OAUTH_TYPE, claims.get(OAUTH_TYPE, String.class));
+        map.put(USER_ID, claims.get(USER_ID, String.class));
         return map;
     }
 

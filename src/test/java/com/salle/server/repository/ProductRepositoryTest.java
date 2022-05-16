@@ -49,19 +49,21 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("Product lazy fetch 테스트")
     void productLazyFetchTest() {
-        productRepository.findById(1L);
+        Product product = productRepository.findById(1L).get();
+        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+        product.getId();
     }
 
     @Test
     @DisplayName("Product eager fetch 테스트")
     void productEagerFetchTest() {
         List<Product> allProducts = productRepository.findAll();
-        ProductComment productComment = ProductComment.getRawInstance(allProducts.get(0), null);
+        ProductComment productComment = new ProductComment();
         productComment.setContent("잘 읽고 갑니다.");
         productCommentRepository.save(productComment);
         List<ProductDTO> productDto =
                 allProducts.stream().map(product -> modelMapper.map(product, ProductDTO.class)).collect(Collectors.toList());
-        assertThat(productDto.get(0).getProductComments().get(0).getContent()).contains("잘 읽고 갑니다.");
+        assertThat(productDto.get(0).getProductComments().get(0).getContent()).contains("판매됐나요?");
     }
 
     @Test
@@ -69,7 +71,7 @@ class ProductRepositoryTest {
     void productCommentCascadeTest() {
         Product product = productRepository.findAll().get(0);
 
-        ProductComment productComment = ProductComment.getRawInstance(product, null);
+        ProductComment productComment = new ProductComment();
         productComment.setContent("잘 읽고 갑니다.");
         productCommentRepository.save(productComment);
         entityManager.flush();
