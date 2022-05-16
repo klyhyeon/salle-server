@@ -1,4 +1,4 @@
-package com.salle.server.domain;
+package com.salle.server.domain.entity;
 
 import javax.persistence.*;
 import java.util.List;
@@ -9,9 +9,9 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY,mappedBy = "category")
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 }
