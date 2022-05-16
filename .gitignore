@@ -6,8 +6,8 @@ build/
 !**/src/test/**/build/
 
 ### salle ###
-/src/main/resources/application.yaml
-/src/main/java/com/salle/server/utils/JwtTokenProvider.java
+src/main/resources/application.yaml
+src/main/java/com/salle/server/utils/JwtTokenProvider.java
 
 ### STS ###
 .apt_generated
