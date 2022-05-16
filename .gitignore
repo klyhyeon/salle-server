@@ -7,6 +7,7 @@ build/
 
 ### salle ###
 !**/src/main/resources/application.yaml
+!**/src/main/utils/JwtTokenProvider.java
 
 ### STS ###
 .apt_generated
