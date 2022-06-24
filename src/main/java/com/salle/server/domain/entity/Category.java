@@ -7,11 +7,15 @@ import java.util.List;
 @Table(name = "CATEGORY")
 public class Category {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
+  private String name;
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private ParentCategory parentCategory;
+
+  @OneToMany(mappedBy = "category")
+  private List<Product> products;
+
 }
