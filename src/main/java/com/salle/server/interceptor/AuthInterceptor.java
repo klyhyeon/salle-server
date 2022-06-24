@@ -13,38 +13,38 @@ import java.util.Map;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private static final String AUTHORIZATION = "Authorization";
-    public static final String OAUTH_LOGIN = "oauthLogin";
-    public static final String OAUTH_TYPE = "oauthType";
-    public static final String USER_ID = "userId";
+  private static final String AUTHORIZATION = "Authorization";
+  public static final String OAUTH_LOGIN = "oauthLogin";
+  public static final String OAUTH_TYPE = "oauthType";
+  public static final String USER_ID = "userId";
 
-    private JwtTokenProvider jwtTokenProvider;
+  private JwtTokenProvider jwtTokenProvider;
 
-    public AuthInterceptor(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
+  public AuthInterceptor(JwtTokenProvider jwtTokenProvider) {
+    this.jwtTokenProvider = jwtTokenProvider;
+  }
+
+  @Override
+  public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
+    if (isMethodOption(request)) {
+      return true;
     }
 
-    @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    String authToken = request.getHeader(AUTHORIZATION);
+    ifTokenNotExistsThrowException(authToken);
+    Map<String, String> claimMap = jwtTokenProvider.getClaims(authToken);
+    request.setAttribute(USER_ID, claimMap.get(USER_ID));
+    return true;
+  }
 
-        if (isMethodOption(request)) {
-            return true;
-        }
+  private boolean isMethodOption(HttpServletRequest request) {
+    return request.getMethod().equals("OPTIONS");
+  }
 
-        String authToken = request.getHeader(AUTHORIZATION);
-        ifTokenNotExistsThrowException(authToken);
-        Map<String, String> claimMap = jwtTokenProvider.getClaims(authToken);
-        request.setAttribute(USER_ID, claimMap.get(USER_ID));
-        return true;
+  private void ifTokenNotExistsThrowException(String authToken) {
+    if (authToken == null || authToken.isEmpty()) {
+      throw new SlErrorException(ErrorCode.AUTH_WRONG_REQUEST);
     }
-
-    private boolean isMethodOption(HttpServletRequest request) {
-        return request.getMethod().equals("OPTIONS");
-    }
-
-    private void ifTokenNotExistsThrowException(String authToken) {
-        if (authToken == null || authToken.isEmpty()) {
-            throw new SlErrorException(ErrorCode.AUTH_WRONG_REQUEST);
-        }
-    }
+  }
 }
